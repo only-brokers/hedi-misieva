@@ -3,40 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Инвестиции в недвижимость премиум-класса | Хеди Мисиева</title>
+    <title>Premium Real Estate & Partnership | Хеди Мисиева</title>
     
-    <!-- Подключение шрифтов: Playfair Display для заголовков, Montserrat для текста -->
+    <!-- Шрифты: Playfair Display (заголовки) и Montserrat (текст) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Иконки FontAwesome -->
+    <!-- Иконки -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ================= VARIABLES ================= */
+        /* ================= ПЕРЕМЕННЫЕ ================= */
         :root {
-            --bg-color: #050505;
-            --text-main: #f0f0f0;
+            --bg-dark: #030303;
+            --bg-card: rgba(15, 15, 15, 0.4);
+            --gold-light: #F9E596;
+            --gold-main: #D4AF37;
+            --gold-dark: #997A15;
+            --gold-gradient: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #997A15 100%);
+            --text-main: #ffffff;
             --text-muted: #a0a0a0;
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --gold-gradient: linear-gradient(135deg, #E6C875 0%, #B8860B 100%);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.15);
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        /* ================= RESET & BASE ================= */
+        /* ================= БАЗОВЫЕ НАСТРОЙКИ ================= */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
             line-height: 1.6;
@@ -47,17 +52,45 @@
             font-weight: 600;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
+        a { text-decoration: none; }
+
+        /* ================= АНИМИРОВАННЫЙ ФОН (ЖИВОЙ САЙТ) ================= */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -3;
+            overflow: hidden;
+            background: #000;
         }
 
-        /* ================= UTILITIES ================= */
+        .blob {
+            position: absolute;
+            filter: blur(90px);
+            opacity: 0.4;
+            border-radius: 50%;
+            animation: float 20s infinite alternate ease-in-out;
+            will-change: transform;
+        }
+
+        .blob-1 { width: 400px; height: 400px; background: rgba(212, 175, 55, 0.15); top: -10%; left: -10%; }
+        .blob-2 { width: 500px; height: 500px; background: rgba(153, 122, 21, 0.1); bottom: -20%; right: -10%; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: rgba(255, 255, 255, 0.05); top: 40%; left: 50%; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Прогресс-бар скролла */
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: var(--gold-gradient);
+            z-index: 1000; transition: width 0.1s;
+        }
+
+        /* ================= УТИЛИТЫ ================= */
         .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;
         }
 
         .gold-text {
@@ -67,651 +100,380 @@
             display: inline-block;
         }
 
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gold-gradient);
-            color: #000;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 16px 40px;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            box-shadow: 0 10px 30px rgba(184, 134, 11, 0.2);
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
+        /* Кнопки с бликом */
+        .btn {
+            position: relative;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 16px 36px; border-radius: 50px;
+            font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.95rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            overflow: hidden; transition: all 0.4s ease;
+            cursor: pointer; text-align: center;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(184, 134, 11, 0.4);
+        .btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); transition: all 0.7s ease;
         }
 
-        .section-padding {
-            padding: 120px 0;
+        .btn:hover::after { left: 150%; }
+        .btn:hover { transform: translateY(-3px); }
+
+        .btn-gold {
+            background: var(--gold-gradient); color: #000;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); border: none;
         }
 
-        .section-title {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #fff;
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05); color: var(--gold-light);
+            border: 1px solid var(--gold-main); backdrop-filter: blur(10px);
+        }
+        
+        .btn-glass:hover {
+            background: rgba(212, 175, 55, 0.1); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
         }
 
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 60px;
-        }
+        .section-padding { padding: 120px 0; }
+        .section-title { font-size: 3rem; text-align: center; margin-bottom: 20px; }
+        .section-subtitle { text-align: center; color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 60px; }
 
-        /* Glassmorphism */
+        /* Glass Cards (3D Hover) */
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: var(--bg-card);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            transition: var(--transition);
+            border-radius: 24px; padding: 40px;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s;
+            position: relative; overflow: hidden;
         }
 
         .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
             transform: translateY(-10px);
-            border-color: rgba(212, 175, 55, 0.4);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
         }
 
-        /* ================= HERO SECTION ================= */
+        /* ================= HERO СЕКЦИЯ ================= */
         .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding-top: 80px;
+            position: relative; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; padding: 100px 20px 60px;
             overflow: hidden;
         }
 
         .hero-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 120%;
-            /* Дубай фоновое изображение */
+            position: absolute; top: 0; left: 0; width: 100%; height: 120%;
             background: url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
             z-index: -2;
-            will-change: transform;
         }
 
         .hero-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(5,5,5,0.3) 0%, rgba(5,5,5,0.95) 100%);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(3,3,3,0.4) 0%, rgba(3,3,3,0.95) 100%);
             z-index: -1;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            z-index: 1;
         }
 
         .broker-name {
-            font-size: 1.5rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
+            font-size: 1rem; letter-spacing: 4px; text-transform: uppercase;
+            margin-bottom: 20px; font-weight: 400; color: var(--text-muted);
         }
 
         .broker-name span {
-            font-weight: 600;
-            font-size: 2rem;
-            display: block;
-            margin-top: 10px;
-            font-family: 'Playfair Display', serif;
-            text-transform: none;
-            letter-spacing: 1px;
+            font-weight: 700; font-size: 2.2rem; display: block;
+            margin-top: 5px; font-family: 'Playfair Display', serif;
+            letter-spacing: 2px;
         }
 
-        .hero h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            margin-bottom: 30px;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .hero h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 25px; }
+        .hero p { font-size: 1.1rem; color: #dcdcdc; max-width: 700px; margin: 0 auto 50px; font-weight: 300; }
+
+        .hero-buttons {
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
         }
 
-        .hero p {
-            font-size: 1.2rem;
-            color: #dcdcdc;
-            margin-bottom: 50px;
-            font-weight: 300;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+        /* ================= SPLIT SECTIONS (ПОКУПАТЕЛЯМ И ПАРТНЁРАМ) ================= */
+        .split-section { position: relative; }
+        
+        .split-header {
+            text-align: center; margin-bottom: 60px;
         }
 
-        /* ================= ABOUT SECTION ================= */
-        .about-section {
-            background: var(--bg-color);
-            position: relative;
+        .split-badge {
+            display: inline-block; padding: 8px 20px; border-radius: 30px;
+            background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-main);
+            color: var(--gold-light); font-size: 0.85rem; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 20px;
         }
 
+        /* Grid */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem; color: var(--gold-main); margin-bottom: 20px;
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Секция инвесторов */
+        #investors { padding-top: 60px; }
+        
+        /* Секция партнёров */
+        #partners {
+            background: radial-gradient(circle at right center, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ================= ИНФО-БЛОК С ФОТО ================= */
         .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-text h2 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-        }
-
-        .about-text p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-
-        .about-list {
-            list-style: none;
-            margin-top: 30px;
-        }
-
-        .about-list li {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .about-list i {
-            color: var(--gold);
-            margin-right: 15px;
-            font-size: 1.2rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
         }
 
         .about-image {
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
+            border-radius: 24px; overflow: hidden; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .about-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-            /* Бали/Таиланд вилла */
-            transition: var(--transition);
+            width: 100%; display: block; transition: transform 0.7s;
         }
 
-        .about-image::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            box-shadow: inset 0 0 0 1px var(--glass-border);
-            pointer-events: none;
-        }
+        .about-image:hover img { transform: scale(1.05); }
 
-        /* ================= HOW IT WORKS ================= */
-        .steps-section {
-            position: relative;
+        .about-list { list-style: none; margin-top: 30px; }
+        .about-list li {
+            display: flex; align-items: center; margin-bottom: 15px; font-size: 1.1rem;
+            padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;
         }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            position: relative;
-        }
-
-        .step-card {
-            text-align: center;
-            padding: 30px 20px;
-        }
-
-        .step-number {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-family: 'Playfair Display', serif;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-
-        .step-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .step-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        /* ================= ADVANTAGES ================= */
-        .advantages-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
-        .adv-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 25px;
-        }
-
-        .adv-icon {
-            font-size: 2.5rem;
-            color: var(--gold);
-            background: linear-gradient(135deg, #E6C875 0%, #B8860B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .adv-content h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-
-        .adv-content p {
-            color: var(--text-muted);
-        }
-
-        /* ================= TRUST BLOCK ================= */
-        .trust-section {
-            position: relative;
-            padding: 150px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .trust-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 120%;
-            /* Элитный интерьер / Таиланд */
-            background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-            z-index: -2;
-            will-change: transform;
-        }
-
-        .trust-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 5, 0.85);
-            z-index: -1;
-        }
-
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin-top: 60px;
-        }
-
-        .trust-item h3 {
-            font-size: 1.5rem;
-            margin: 20px 0 10px;
-            color: var(--gold-light);
-        }
-
-        .trust-item i {
-            font-size: 3rem;
-            color: var(--gold);
-        }
-
-        /* ================= CTA SECTION ================= */
-        .cta-section {
-            text-align: center;
-            padding: 120px 0;
-            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, rgba(5,5,5,1) 60%);
-        }
-
-        .cta-section h2 {
-            font-size: 3.5rem;
-            max-width: 800px;
-            margin: 0 auto 40px;
-            line-height: 1.2;
-        }
+        .about-list li:hover { background: rgba(212, 175, 55, 0.05); }
+        .about-list i { color: var(--gold-main); margin-right: 15px; font-size: 1.4rem; }
 
         /* ================= FOOTER ================= */
         footer {
             border-top: 1px solid rgba(255,255,255,0.05);
-            padding: 60px 0 30px;
-            background: #030303;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            padding: 80px 0 40px; background: #020202; text-align: center;
         }
 
         .footer-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            color: var(--gold);
-            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif; font-size: 2rem;
+            color: var(--gold-main); margin-bottom: 20px;
         }
 
-        .social-links {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
+        .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
         .social-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #fff;
-            transition: var(--transition);
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: #fff; transition: all 0.3s;
         }
+        .social-btn:hover { background: var(--gold-main); color: #000; transform: translateY(-5px); }
 
-        .social-btn:hover {
-            background: var(--gold);
-            color: #000;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
-        }
-
-        .copyright {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* ================= ANIMATIONS ================= */
-        .fade-up {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-
-        .fade-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        /* ================= АНИМАЦИИ ПРИ СКРОЛЛЕ ================= */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
         .delay-1 { transition-delay: 0.1s; }
         .delay-2 { transition-delay: 0.2s; }
         .delay-3 { transition-delay: 0.3s; }
-        .delay-4 { transition-delay: 0.4s; }
 
-        /* ================= RESPONSIVE ================= */
+        /* ================= АДАПТИВ (MOBILE) ================= */
         @media (max-width: 992px) {
-            .hero h1 { font-size: 3.5rem; }
+            .hero h1 { font-size: 3rem; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
             .about-grid { grid-template-columns: 1fr; }
             .about-image { order: -1; }
-            .steps-grid { grid-template-columns: repeat(2, 1fr); }
-            .trust-grid { grid-template-columns: 1fr; gap: 30px; }
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .hero p { font-size: 1rem; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero-buttons { flex-direction: column; width: 100%; }
+            .btn { width: 100%; padding: 18px; }
+            .features-grid { grid-template-columns: 1fr; }
             .section-title { font-size: 2.2rem; }
-            .advantages-grid { grid-template-columns: 1fr; }
-            .cta-section h2 { font-size: 2.2rem; }
-            .btn-primary { padding: 14px 30px; font-size: 0.9rem; }
-        }
-
-        @media (max-width: 480px) {
-            .steps-grid { grid-template-columns: 1fr; }
-            .glass-card { padding: 25px; }
+            .glass-card { padding: 30px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HERO SECTION -->
+    <!-- Живой фон (сферы) -->
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Индикатор скролла -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- ================= HERO ================= -->
     <header class="hero">
         <div class="hero-bg" id="heroBg"></div>
         <div class="hero-overlay"></div>
         
-        <div class="container hero-content">
-            <div class="broker-name fade-up">
-                Представитель платформы
+        <div class="container relative" style="z-index: 2;">
+            <div class="broker-name reveal">
+                Представитель платформы ONLYBROKERS
                 <span class="gold-text">Хеди Мисиева</span>
             </div>
-            <h1 class="fade-up delay-1">Инвестиции в недвижимость премиум-класса</h1>
-            <p class="fade-up delay-2">Эксклюзивные условия для клиентов через закрытую партнёрскую платформу ONLYBROKERS. Дубай, Бали, Таиланд.</p>
-            <div class="fade-up delay-3">
-                <a href="https://onlyclients.com/?ref=5DPQUPZD" target="_blank" class="btn-primary">
-                    Смотреть проекты <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i>
-                </a>
+            <h1 class="reveal delay-1">Элитная Недвижимость<br>и Партнёрство</h1>
+            <p class="reveal delay-2">Доступ к закрытым стартам продаж для инвесторов и платформа с высокими комиссиями для профессионалов рынка.</p>
+            
+            <div class="hero-buttons reveal delay-3">
+                <a href="#investors" class="btn btn-gold">Я Покупатель <i class="fa-solid fa-key" style="margin-left:8px;"></i></a>
+                <a href="#partners" class="btn btn-glass">Я Партнёр <i class="fa-solid fa-handshake" style="margin-left:8px;"></i></a>
             </div>
         </div>
     </header>
 
-    <!-- ABOUT SECTION -->
-    <section class="about-section section-padding">
+    <!-- ================= ДЛЯ ПОКУПАТЕЛЕЙ (ИНВЕСТОРОВ) ================= -->
+    <section id="investors" class="split-section section-padding">
         <div class="container">
-            <div class="about-grid">
-                <div class="about-text fade-up">
-                    <h2 class="gold-text">Привилегии ONLYBROKERS</h2>
-                    <p>ONLYBROKERS — это элитная партнёрская платформа, открывающая двери к лучшим объектам недвижимости до их выхода на открытый рынок.</p>
-                    <p>Работая со мной, вы получаете статус VIP-клиента и доступ к закрытым базам ведущих девелоперов мира.</p>
-                    
+            <div class="split-header reveal">
+                <div class="split-badge">Для Клиентов и Инвесторов</div>
+                <h2 class="section-title">Инвестируйте на<br><span class="gold-text">Эксклюзивных Условиях</span></h2>
+                <p class="section-subtitle">Дубай, Бали, Таиланд. Получите предложения, которых нет в открытом доступе.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="glass-card reveal delay-1 js-tilt">
+                    <div class="feature-icon"><i class="fa-solid fa-gem"></i></div>
+                    <h3>Закрытые продажи</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Бронируйте лучшие лоты до официального старта по минимальной цене.</p>
+                </div>
+                <div class="glass-card reveal delay-2 js-tilt">
+                    <div class="feature-icon"><i class="fa-solid fa-percent"></i></div>
+                    <h3>Спец. условия</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Индивидуальные скидки, подарки от застройщиков и беспроцентная рассрочка.</p>
+                </div>
+                <div class="glass-card reveal delay-3 js-tilt">
+                    <div class="feature-icon"><i class="fa-solid fa-file-shield"></i></div>
+                    <h3>Безопасная сделка</h3>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Прямой договор с девелопером. Полное юридическое сопровождение.</p>
+                </div>
+            </div>
+
+            <div class="reveal" style="text-align: center; margin-top: 60px;">
+                <!-- ССЫЛКА ДЛЯ КЛИЕНТОВ -->
+                <a href="https://onlyclients.com/?ref=5DPQUPZD" target="_blank" class="btn btn-gold" style="padding: 20px 50px; font-size: 1.1rem;">
+                    Перейти к объектам <i class="fa-solid fa-arrow-right" style="margin-left:10px;"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ДЛЯ ПАРТНЁРОВ (БРОКЕРОВ) ================= -->
+    <section id="partners" class="split-section section-padding">
+        <div class="container">
+            <div class="split-header reveal">
+                <div class="split-badge">Для Брокеров и Агентов</div>
+                <h2 class="section-title">Станьте партнёром<br><span class="gold-text">ONLYBROKERS</span></h2>
+                <p class="section-subtitle">Продавайте недвижимость по всему миру без лицензии и опыта. Всю документацию и сопровождение мы берем на себя.</p>
+            </div>
+
+            <div class="about-grid" style="margin-bottom: 60px;">
+                <div class="about-image reveal js-tilt">
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80" alt="Партнерство">
+                </div>
+                <div class="reveal delay-2">
+                    <h3 style="font-size: 2rem; margin-bottom: 20px;">Зарабатывайте на международном рынке</h3>
                     <ul class="about-list">
-                        <li><i class="fa-solid fa-check-circle"></i> Специальные цены от застройщиков</li>
-                        <li><i class="fa-solid fa-check-circle"></i> Эксклюзивные скидки и бонусы</li>
-                        <li><i class="fa-solid fa-check-circle"></i> Персональные условия рассрочки</li>
-                        <li><i class="fa-solid fa-check-circle"></i> Полное юридическое сопровождение</li>
+                        <li><i class="fa-solid fa-money-bill-trend-up"></i> <div><strong>Высокие комиссии.</strong> Выплаты сразу после подписания договора клиентом.</div></li>
+                        <li><i class="fa-solid fa-lock"></i> <div><strong>Защита лидов.</strong> Ваш клиент закрепляется за вами навсегда в системе платформы.</div></li>
+                        <li><i class="fa-solid fa-globe"></i> <div><strong>Работа из любой точки.</strong> Продавайте Дубай, Бали или Таиланд удаленно.</div></li>
+                        <li><i class="fa-solid fa-graduation-cap"></i> <div><strong>Обучение.</strong> Доступ к вебинарам, материалам и закрытому комьюнити.</div></li>
                     </ul>
                 </div>
-                <div class="about-image fade-up delay-2">
-                    <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80" alt="Premium Real Estate">
-                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="steps-section section-padding">
-        <div class="container">
-            <h2 class="section-title fade-up">Как это работает</h2>
-            <p class="section-subtitle fade-up">Ваш путь к премиальной недвижимости в 4 простых шага</p>
-
-            <div class="steps-grid">
-                <div class="step-card fade-up delay-1">
-                    <div class="step-number">1</div>
-                    <h3>Выбор объекта</h3>
-                    <p>Вы изучаете каталог закрытых проектов и выбираете подходящий лот.</p>
-                </div>
-                <div class="step-card fade-up delay-2">
-                    <div class="step-number">2</div>
-                    <h3>Переход по ссылке</h3>
-                    <p>Активируете эксклюзивные условия через партнёрский доступ.</p>
-                </div>
-                <div class="step-card fade-up delay-3">
-                    <div class="step-number">3</div>
-                    <h3>Заявка</h3>
-                    <p>Оставляете запрос, и ваша бронь фиксируется напрямую у застройщика.</p>
-                </div>
-                <div class="step-card fade-up delay-4">
-                    <div class="step-number">4</div>
-                    <h3>Сделка</h3>
-                    <p>Ведущий девелопер проводит сделку и сопровождает вас до вручения ключей.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ADVANTAGES SECTION -->
-    <section class="advantages-section section-padding">
-        <div class="container">
-            <h2 class="section-title fade-up">Преимущества платформы</h2>
-            <p class="section-subtitle fade-up">Почему инвесторы выбирают ONLYBROKERS</p>
-
-            <div class="advantages-grid">
-                <div class="glass-card adv-card fade-up">
-                    <div class="adv-icon"><i class="fa-solid fa-briefcase"></i></div>
-                    <div class="adv-content">
-                        <h3 class="gold-text">Без опыта брокера</h3>
-                        <p>Вам не нужно быть экспертом рынка. Платформа и застройщики берут всю документацию и процессы на себя.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card adv-card fade-up delay-1">
-                    <div class="adv-icon"><i class="fa-solid fa-handshake"></i></div>
-                    <div class="adv-content">
-                        <h3 class="gold-text">Прямые условия</h3>
-                        <p>Никаких скрытых комиссий. Вы получаете предложения и цены напрямую от лучших девелоперов мира.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card adv-card fade-up delay-2">
-                    <div class="adv-icon"><i class="fa-solid fa-layer-group"></i></div>
-                    <div class="adv-content">
-                        <h3 class="gold-text">Простая система</h3>
-                        <p>Интуитивно понятный каталог, быстрая бронь и мгновенная связь с представителями проектов.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card adv-card fade-up delay-3">
-                    <div class="adv-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <div class="adv-content">
-                        <h3 class="gold-text">Возможность заработка</h3>
-                        <p>Привлекайте партнёров и получайте вознаграждения за успешные рекомендации в элитном сегменте.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- TRUST SECTION -->
-    <section class="trust-section">
-        <div class="trust-bg" id="trustBg"></div>
-        <div class="trust-overlay"></div>
-        
-        <div class="container relative z-10">
-            <h2 class="section-title fade-up">Гарантия надёжности</h2>
-            
-            <div class="trust-grid">
-                <div class="trust-item fade-up delay-1">
-                    <i class="fa-regular fa-building"></i>
-                    <h3>Ведущие девелоперы</h3>
-                    <p>Сотрудничаем только с проверенными застройщиками Дубая, Бали и Таиланда.</p>
-                </div>
-                <div class="trust-item fade-up delay-2">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <h3>Прозрачная система</h3>
-                    <p>Полный контроль каждого этапа сделки через личный кабинет.</p>
-                </div>
-                <div class="trust-item fade-up delay-3">
-                    <i class="fa-solid fa-lock"></i>
-                    <h3>Защита клиента</h3>
-                    <p>Каждый клиент надёжно закрепляется за партнёром в системе.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA SECTION -->
-    <section class="cta-section">
-        <div class="container">
-            <h2 class="fade-up">Получите доступ к лучшим предложениям рынка уже сейчас</h2>
-            <div class="fade-up delay-1">
-                <a href="https://onlyclients.com/?ref=5DPQUPZD" target="_blank" class="btn-primary" style="font-size: 1.2rem; padding: 20px 50px;">
-                    Перейти к проектам <i class="fa-solid fa-arrow-right" style="margin-left: 15px;"></i>
+            <div class="reveal" style="text-align: center;">
+                <!-- ССЫЛКА ДЛЯ ПАРТНЕРОВ -->
+                <a href="https://www.onlybrokers.com/register?ref=DWSM9JK5" target="_blank" class="btn btn-glass" style="padding: 20px 50px; font-size: 1.1rem; border-color: var(--gold-main);">
+                    Регистрация партнёра <i class="fa-solid fa-user-plus" style="margin-left:10px;"></i>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- ================= ФУТЕР ================= -->
     <footer>
-        <div class="container footer-content">
-            <div class="footer-logo">Хеди Мисиева</div>
+        <div class="container">
+            <div class="footer-logo reveal">Хеди Мисиева</div>
+            <p style="color: var(--text-muted); margin-bottom: 30px;" class="reveal delay-1">Официальный представитель ONLYBROKERS</p>
             
-            <div class="social-links">
-                <a href="https://t.me/Welcomee_to_Dubai" target="_blank" class="social-btn" aria-label="Telegram">
-                    <i class="fa-brands fa-telegram-plane"></i>
-                </a>
-                <a href="https://www.instagram.com/_onlybrokers" target="_blank" class="social-btn" aria-label="Instagram">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
+            <div class="social-links reveal delay-2">
+                <a href="https://t.me/Welcomee_to_Dubai" target="_blank" class="social-btn"><i class="fa-brands fa-telegram-plane"></i></a>
+                <a href="https://www.instagram.com/_onlybrokers" target="_blank" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
             </div>
 
-            <p class="copyright">&copy; 2026 Хеди Мисиева x ONLYBROKERS. Все права защищены.</p>
+            <p style="color: #555; font-size: 0.9rem;" class="reveal delay-3">&copy; 2026 Хеди Мисиева. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT -->
+    <!-- ================= СКРИПТЫ (Анимации и Интерактив) ================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // 1. Анимация появления элементов при скролле (Intersection Observer)
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.15
-            };
+            // 1. Скролл прогресс-бар
+            const progressBar = document.getElementById('scrollProgress');
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                progressBar.style.width = scrolled + "%";
+            });
 
-            const observer = new IntersectionObserver((entries, observer) => {
+            // 2. Анимация появления элементов (Intersection Observer)
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); // Анимируем только один раз
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
+            }, revealOptions);
 
-            document.querySelectorAll('.fade-up').forEach(el => {
-                observer.observe(el);
-            });
+            reveals.forEach(el => revealOnScroll.observe(el));
 
-            // 2. Плавный параллакс для фоновых изображений
+            // 3. Плавный параллакс фона Hero
             const heroBg = document.getElementById('heroBg');
-            const trustBg = document.getElementById('trustBg');
-
             window.addEventListener('scroll', () => {
                 const scrolled = window.pageYOffset;
-                
-                // Параллакс для Hero
-                if (heroBg && scrolled < window.innerHeight) {
+                if (scrolled < window.innerHeight) {
                     heroBg.style.transform = `translate3d(0, ${scrolled * 0.4}px, 0)`;
                 }
-
-                // Параллакс для Trust Section (рассчитываем позицию)
-                if (trustBg) {
-                    const trustSection = trustBg.parentElement;
-                    const rect = trustSection.getBoundingClientRect();
-                    // Если секция в области видимости
-                    if (rect.top <= window.innerHeight && rect.bottom >= 0) {
-                        const offset = (window.innerHeight - rect.top) * 0.2;
-                        trustBg.style.transform = `translate3d(0, ${offset}px, 0)`;
-                    }
-                }
             });
+
+            // 4. Легкий 3D Tilt эффект для карточек (только для десктопов)
+            if (window.innerWidth > 768) {
+                const cards = document.querySelectorAll('.js-tilt');
+                cards.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+                        
+                        const rotateX = ((y - centerY) / centerY) * -5; // max 5 deg
+                        const rotateY = ((x - centerX) / centerX) * 5;
+                        
+                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                        // Добавляем блик света за курсором
+                        card.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.08) 0%, rgba(15,15,15,0.4) 60%)`;
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                        card.style.background = `rgba(15, 15, 15, 0.4)`; // Возврат к default bg
+                    });
+                });
+            }
         });
     </script>
 </body>
