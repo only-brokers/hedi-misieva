@@ -293,9 +293,46 @@
             .section-title { font-size: 2.2rem; }
             .glass-card { padding: 30px 20px; }
         }
+
+        /* ================= ADMIN PANEL CSS ================= */
+        #admin-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            gap: 10px;
+        }
+        .admin-btn {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid var(--gold-main);
+            color: var(--gold-light);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .admin-btn:hover {
+            background: var(--gold-main);
+            color: #000;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        .admin-hidden { display: none !important; }
+        .editing-mode { outline: 1px dashed rgba(212, 175, 55, 0.8); outline-offset: 4px; border-radius: 4px; }
     </style>
 </head>
 <body>
+
+    <!-- Админ панель -->
+    <div id="admin-panel">
+        <button id="btn-edit" class="admin-btn admin-hidden">Редактировать</button>
+        <button id="btn-save" class="admin-btn admin-hidden">Сохранить</button>
+        <button id="btn-admin" class="admin-btn">Admin</button>
+    </div>
 
     <!-- Живой фон (сферы) -->
     <div class="ambient-bg">
@@ -308,7 +345,7 @@
     <div class="scroll-progress" id="scrollProgress"></div>
 
     <!-- ================= HERO ================= -->
-    <header class="hero">
+    <header class="hero" id="section-hero">
         <div class="hero-bg" id="heroBg"></div>
         <div class="hero-overlay"></div>
         
@@ -397,7 +434,7 @@
     </section>
 
     <!-- ================= ФУТЕР ================= -->
-    <footer>
+    <footer id="section-footer">
         <div class="container">
             <div class="footer-logo reveal">Хеди Мисиева</div>
             <p style="color: var(--text-muted); margin-bottom: 30px;" class="reveal delay-1">Официальный партнер ONLYBROKERS</p>
@@ -411,11 +448,116 @@
         </div>
     </footer>
 
-    <!-- ================= СКРИПТЫ (Анимации и Интерактив) ================= -->
+    <!-- ================= СКРИПТЫ ================= -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. ЛОГИКА АДМИН ПАНЕЛИ И СОХРАНЕНИЯ ТЕКСТОВ ---
+        const btnAdmin = document.getElementById('btn-admin');
+        const btnEdit = document.getElementById('btn-edit');
+        const btnSave = document.getElementById('btn-save');
+        let isAdmin = false;
+        let isEditing = false;
+
+        // Селекторы элементов, в которых разрешено редактирование текста
+        const textSelectors = 'h1, h2, h3, h4, p, span.gold-text, div.broker-name, div.split-badge, li div, a.btn, .footer-logo';
+
+        // Восстановление текста при загрузке страницы
+        function loadSavedContent() {
+            const savedData = localStorage.getItem('websiteContent');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                // Заменяем внутренности основных блоков сохраненными
+                if(data.hero) document.querySelector('#section-hero .container').innerHTML = data.hero;
+                if(data.investors) document.querySelector('#investors .container').innerHTML = data.investors;
+                if(data.partners) document.querySelector('#partners .container').innerHTML = data.partners;
+                if(data.footer) document.querySelector('#section-footer .container').innerHTML = data.footer;
+            }
+        }
+        
+        loadSavedContent(); // Запускаем перед инициализацией основных скриптов сайта
+
+        btnAdmin.addEventListener('click', () => {
+            if (!isAdmin) {
+                const password = prompt('Введите пароль для доступа:');
+                if (password === 'surennazish') {
+                    isAdmin = true;
+                    btnEdit.classList.remove('admin-hidden');
+                    btnSave.classList.remove('admin-hidden');
+                    btnAdmin.innerText = 'Выйти';
+                    alert('Доступ разрешен. Можете редактировать тексты.');
+                } else if (password !== null) {
+                    alert('Неверный пароль!');
+                }
+            } else {
+                isAdmin = false;
+                isEditing = false;
+                toggleEditMode(false);
+                btnEdit.classList.add('admin-hidden');
+                btnSave.classList.add('admin-hidden');
+                btnAdmin.innerText = 'Admin';
+                btnEdit.innerText = 'Редактировать';
+                btnEdit.style.background = '';
+                btnEdit.style.color = '';
+            }
+        });
+
+        btnEdit.addEventListener('click', () => {
+            isEditing = !isEditing;
+            toggleEditMode(isEditing);
+            if (isEditing) {
+                btnEdit.innerText = 'Выкл. Редактор';
+                btnEdit.style.background = 'var(--gold-main)';
+                btnEdit.style.color = '#000';
+            } else {
+                btnEdit.innerText = 'Редактировать';
+                btnEdit.style.background = '';
+                btnEdit.style.color = '';
+            }
+        });
+
+        function toggleEditMode(enable) {
+            const elements = document.querySelectorAll(textSelectors);
+            elements.forEach(el => {
+                if (enable) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.classList.add('editing-mode');
+                } else {
+                    el.removeAttribute('contenteditable');
+                    el.classList.remove('editing-mode');
+                }
+            });
+        }
+
+        // Блокируем случайные переходы по ссылкам во время редактирования
+        document.body.addEventListener('click', (e) => {
+            if (isEditing && e.target.closest('a')) {
+                e.preventDefault();
+            }
+        });
+
+        btnSave.addEventListener('click', () => {
+            // Временно отключаем мод редактирования, чтобы не сохранить атрибуты contenteditable и рамки
+            const wasEditing = isEditing;
+            if (wasEditing) toggleEditMode(false);
+
+            // Собираем HTML всех 4-х главных контейнеров
+            const siteContent = {
+                hero: document.querySelector('#section-hero .container').innerHTML,
+                investors: document.querySelector('#investors .container').innerHTML,
+                partners: document.querySelector('#partners .container').innerHTML,
+                footer: document.querySelector('#section-footer .container').innerHTML
+            };
+
+            localStorage.setItem('websiteContent', JSON.stringify(siteContent));
             
-            // 1. Скролл прогресс-бар
+            if (wasEditing) toggleEditMode(true);
+            
+            alert('Все изменения успешно сохранены!');
+        });
+
+
+        // --- 2. ОСНОВНЫЕ СКРИПТЫ САЙТА (Анимации и Интерактив) ---
+        function initSiteScripts() {
+            // Скролл прогресс-бар
             const progressBar = document.getElementById('scrollProgress');
             window.addEventListener('scroll', () => {
                 const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -424,7 +566,7 @@
                 progressBar.style.width = scrolled + "%";
             });
 
-            // 2. Анимация появления элементов (Intersection Observer)
+            // Анимация появления элементов
             const reveals = document.querySelectorAll('.reveal');
             const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
             
@@ -439,7 +581,7 @@
 
             reveals.forEach(el => revealOnScroll.observe(el));
 
-            // 3. Плавный параллакс фона Hero
+            // Плавный параллакс фона Hero
             const heroBg = document.getElementById('heroBg');
             window.addEventListener('scroll', () => {
                 const scrolled = window.pageYOffset;
@@ -448,7 +590,7 @@
                 }
             });
 
-            // 4. Легкий 3D Tilt эффект для карточек (только для десктопов)
+            // 3D Tilt эффект для карточек (только для десктопов)
             if (window.innerWidth > 768) {
                 const cards = document.querySelectorAll('.js-tilt');
                 cards.forEach(card => {
@@ -456,25 +598,26 @@
                         const rect = card.getBoundingClientRect();
                         const x = e.clientX - rect.left;
                         const y = e.clientY - rect.top;
-                        
                         const centerX = rect.width / 2;
                         const centerY = rect.height / 2;
                         
-                        const rotateX = ((y - centerY) / centerY) * -5; // max 5 deg
+                        const rotateX = ((y - centerY) / centerY) * -5; 
                         const rotateY = ((x - centerX) / centerX) * 5;
                         
                         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-                        // Добавляем блик света за курсором
                         card.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.08) 0%, rgba(15,15,15,0.4) 60%)`;
                     });
 
                     card.addEventListener('mouseleave', () => {
                         card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
-                        card.style.background = `rgba(15, 15, 15, 0.4)`; // Возврат к default bg
+                        card.style.background = `rgba(15, 15, 15, 0.4)`;
                     });
                 });
             }
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', initSiteScripts);
+
     </script>
 </body>
 </html>
