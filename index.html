@@ -40,7 +40,6 @@
             transition: background-color 0.5s, color 0.5s;
         }
 
-        /* Убрал !important, чтобы работала настройка каждого отдельного текста */
         h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 600; }
         a { text-decoration: none; }
 
@@ -430,228 +429,243 @@
 
     <!-- ================= СКРИПТЫ ================= -->
     <script>
-        // --- ЛОГИКА АДМИН ПАНЕЛИ ---
-        const btnAdmin = document.getElementById('btn-admin');
-        const btnEdit = document.getElementById('btn-edit');
-        const btnSave = document.getElementById('btn-save');
-        const btnReset = document.getElementById('btn-reset');
-        const settingsPanel = document.getElementById('settings-panel');
-        
-        // Глобальные инпуты
-        const selectTheme = document.getElementById('select-theme');
-        const inputBgColor = document.getElementById('input-bg-color');
-        const inputTextColor = document.getElementById('input-text-color');
-        const inputAccentColor = document.getElementById('input-accent-color');
+        // Обернули весь код в DOMContentLoaded, чтобы гарантровать, что элементы уже загрузились
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // Инлайновые инпуты (для отдельного текста)
-        const inlineToolbar = document.getElementById('inline-toolbar');
-        const inlineColor = document.getElementById('inline-color');
-        const inlineFont = document.getElementById('inline-font');
-
-        let isAdmin = false;
-        let isEditing = false;
-        let currentEditingElement = null; // Элемент, который мы сейчас кликнули
-
-        // Селекторы текстов для редактирования
-        const textSelectors = 'h1, h2, h3, h4, p, span.gold-text, div.broker-name, div.split-badge, li div, a.btn, .footer-logo';
-
-        // Палитра готовых тем
-        const themePresets = {
-            default:   { bg: '#030303', text: '#ffffff', accent: '#D4AF37' },
-            business:  { bg: '#f5f7fa', text: '#2c3e50', accent: '#2980b9' },
-            cyberpunk: { bg: '#0f0f1b', text: '#00ffea', accent: '#ff0055' },
-            retro:     { bg: '#e8dfc8', text: '#4a3b32', accent: '#c0392b' }
-        };
-
-        // Применение цветов к CSS-переменным
-        function applyColors(bg, text, accent) {
-            const root = document.documentElement;
-            root.style.setProperty('--bg-dark', bg);
-            root.style.setProperty('--text-main', text);
-            root.style.setProperty('--accent-main', accent);
+            // --- ЛОГИКА АДМИН ПАНЕЛИ ---
+            const btnAdmin = document.getElementById('btn-admin');
+            const btnEdit = document.getElementById('btn-edit');
+            const btnSave = document.getElementById('btn-save');
+            const btnReset = document.getElementById('btn-reset');
+            const settingsPanel = document.getElementById('settings-panel');
             
-            root.style.setProperty('--gold-gradient', `linear-gradient(135deg, ${accent}aa 0%, ${accent} 50%, ${accent}66 100%)`);
-            // Вычисляем полупрозрачный цвет для приглушенного текста
-            root.style.setProperty('--text-muted', `${text}b3`); 
-            
-            inputBgColor.value = bg;
-            inputTextColor.value = text;
-            inputAccentColor.value = accent;
-        }
+            // Глобальные инпуты
+            const selectTheme = document.getElementById('select-theme');
+            const inputBgColor = document.getElementById('input-bg-color');
+            const inputTextColor = document.getElementById('input-text-color');
+            const inputAccentColor = document.getElementById('input-accent-color');
 
-        // --- ВОССТАНОВЛЕНИЕ ДАННЫХ ПРИ ЗАГРУЗКЕ ---
-        function loadSavedContent() {
-            // Загружаем тему
-            const savedThemeName = localStorage.getItem('websiteThemeName') || 'default';
-            selectTheme.value = savedThemeName;
-            document.body.setAttribute('data-theme', savedThemeName);
+            // Инлайновые инпуты (для отдельного текста)
+            const inlineToolbar = document.getElementById('inline-toolbar');
+            const inlineColor = document.getElementById('inline-color');
+            const inlineFont = document.getElementById('inline-font');
 
-            // Загружаем цвета
-            const savedColors = localStorage.getItem('websiteColors');
-            if (savedColors) {
-                const colors = JSON.parse(savedColors);
-                applyColors(colors.bg, colors.text, colors.accent);
-            } else {
-                const defaultT = themePresets['default'];
-                applyColors(defaultT.bg, defaultT.text, defaultT.accent);
+            let isAdmin = false;
+            let isEditing = false;
+            let currentEditingElement = null;
+
+            // Селекторы текстов для редактирования
+            const textSelectors = 'h1, h2, h3, h4, p, span.gold-text, div.broker-name, div.split-badge, li div, a.btn, .footer-logo';
+
+            // Палитра готовых тем
+            const themePresets = {
+                default:   { bg: '#030303', text: '#ffffff', accent: '#D4AF37' },
+                business:  { bg: '#f5f7fa', text: '#2c3e50', accent: '#2980b9' },
+                cyberpunk: { bg: '#0f0f1b', text: '#00ffea', accent: '#ff0055' },
+                retro:     { bg: '#e8dfc8', text: '#4a3b32', accent: '#c0392b' }
+            };
+
+            // Применение цветов к CSS-переменным
+            function applyColors(bg, text, accent) {
+                const root = document.documentElement;
+                root.style.setProperty('--bg-dark', bg);
+                root.style.setProperty('--text-main', text);
+                root.style.setProperty('--accent-main', accent);
+                
+                root.style.setProperty('--gold-gradient', `linear-gradient(135deg, ${accent}aa 0%, ${accent} 50%, ${accent}66 100%)`);
+                root.style.setProperty('--text-muted', `${text}b3`); 
+                
+                inputBgColor.value = bg;
+                inputTextColor.value = text;
+                inputAccentColor.value = accent;
             }
 
-            // Загружаем контент (тексты + инлайн стили шрифтов)
-            const savedData = localStorage.getItem('websiteContent');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                if(data.hero) document.querySelector('#section-hero .container').innerHTML = data.hero;
-                if(data.investors) document.querySelector('#investors .container').innerHTML = data.investors;
-                if(data.partners) document.querySelector('#partners .container').innerHTML = data.partners;
-                if(data.footer) document.querySelector('#section-footer .container').innerHTML = data.footer;
-            }
-        }
-        loadSavedContent();
+            // --- ВОССТАНОВЛЕНИЕ ДАННЫХ ПРИ ЗАГРУЗКЕ ---
+            function loadSavedContent() {
+                // 1. Загружаем тему
+                const savedThemeName = localStorage.getItem('websiteThemeName') || 'default';
+                selectTheme.value = savedThemeName;
+                document.body.setAttribute('data-theme', savedThemeName);
 
-        // --- ОБРАБОТЧИКИ НАСТРОЕК (ЦВЕТА И ТЕМЫ) ---
-        inputBgColor.addEventListener('input', (e) => applyColors(e.target.value, inputTextColor.value, inputAccentColor.value));
-        inputTextColor.addEventListener('input', (e) => applyColors(inputBgColor.value, e.target.value, inputAccentColor.value));
-        inputAccentColor.addEventListener('input', (e) => applyColors(inputBgColor.value, inputTextColor.value, e.target.value));
-
-        selectTheme.addEventListener('change', (e) => {
-            const themeName = e.target.value;
-            document.body.setAttribute('data-theme', themeName);
-            const t = themePresets[themeName];
-            applyColors(t.bg, t.text, t.accent);
-        });
-
-        // --- ЛОГИКА КНОПОК АДМИНА ---
-        btnAdmin.addEventListener('click', () => {
-            if (!isAdmin) {
-                const password = prompt('Введите пароль:');
-                if (password === 'surennazish') {
-                    isAdmin = true;
-                    btnEdit.classList.remove('admin-hidden');
-                    btnSave.classList.remove('admin-hidden');
-                    settingsPanel.classList.remove('admin-hidden');
-                    btnAdmin.innerText = 'Выйти';
-                    alert('Доступ разрешен.');
-                } else if (password !== null) {
-                    alert('Неверный пароль!');
-                }
-            } else {
-                isAdmin = false;
-                if (isEditing) btnEdit.click(); // Выключаем режим редактирования
-                btnEdit.classList.add('admin-hidden');
-                btnSave.classList.add('admin-hidden');
-                settingsPanel.classList.add('admin-hidden');
-                btnAdmin.innerText = 'Admin';
-            }
-        });
-
-        btnEdit.addEventListener('click', () => {
-            isEditing = !isEditing;
-            const elements = document.querySelectorAll(textSelectors);
-            
-            elements.forEach(el => {
-                if (isEditing) {
-                    el.setAttribute('contenteditable', 'true');
-                    el.classList.add('editing-mode');
-                    el.addEventListener('click', showInlineEditor); // Клик для всплывающей панели
+                // 2. Загружаем цвета
+                const savedColors = localStorage.getItem('websiteColors');
+                if (savedColors) {
+                    const colors = JSON.parse(savedColors);
+                    applyColors(colors.bg, colors.text, colors.accent);
                 } else {
-                    el.removeAttribute('contenteditable');
-                    el.classList.remove('editing-mode');
-                    el.removeEventListener('click', showInlineEditor);
+                    const defaultT = themePresets['default'];
+                    applyColors(defaultT.bg, defaultT.text, defaultT.accent);
+                }
+
+                // 3. Загружаем контент
+                const savedData = localStorage.getItem('websiteContent');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    const heroContainer = document.querySelector('#section-hero .container');
+                    const invContainer = document.querySelector('#investors .container');
+                    const partContainer = document.querySelector('#partners .container');
+                    const footContainer = document.querySelector('#section-footer .container');
+
+                    if(data.hero && heroContainer) heroContainer.innerHTML = data.hero;
+                    if(data.investors && invContainer) invContainer.innerHTML = data.investors;
+                    if(data.partners && partContainer) partContainer.innerHTML = data.partners;
+                    if(data.footer && footContainer) footContainer.innerHTML = data.footer;
+                }
+            }
+            
+            // Вызываем восстановление
+            loadSavedContent();
+
+            // --- ОБРАБОТЧИКИ НАСТРОЕК (ЦВЕТА И ТЕМЫ) ---
+            inputBgColor.addEventListener('input', (e) => applyColors(e.target.value, inputTextColor.value, inputAccentColor.value));
+            inputTextColor.addEventListener('input', (e) => applyColors(inputBgColor.value, e.target.value, inputAccentColor.value));
+            inputAccentColor.addEventListener('input', (e) => applyColors(inputBgColor.value, inputTextColor.value, e.target.value));
+
+            selectTheme.addEventListener('change', (e) => {
+                const themeName = e.target.value;
+                document.body.setAttribute('data-theme', themeName);
+                const t = themePresets[themeName];
+                applyColors(t.bg, t.text, t.accent);
+            });
+
+            // --- ЛОГИКА КНОПОК АДМИНА ---
+            btnAdmin.addEventListener('click', () => {
+                if (!isAdmin) {
+                    const password = prompt('Введите пароль:');
+                    if (password === 'surennazish') {
+                        isAdmin = true;
+                        btnEdit.classList.remove('admin-hidden');
+                        btnSave.classList.remove('admin-hidden');
+                        settingsPanel.classList.remove('admin-hidden');
+                        btnAdmin.innerText = 'Выйти';
+                    } else if (password !== null) {
+                        alert('Неверный пароль!');
+                    }
+                } else {
+                    isAdmin = false;
+                    if (isEditing) btnEdit.click();
+                    btnEdit.classList.add('admin-hidden');
+                    btnSave.classList.add('admin-hidden');
+                    settingsPanel.classList.add('admin-hidden');
+                    btnAdmin.innerText = 'Admin';
                 }
             });
 
-            if (isEditing) {
-                btnEdit.innerText = 'Выкл. Редактор';
-                btnEdit.style.background = 'var(--accent-main)';
-                btnEdit.style.color = '#000';
-            } else {
-                btnEdit.innerText = 'Редактировать';
-                btnEdit.style.background = '';
-                btnEdit.style.color = '';
-                inlineToolbar.classList.add('admin-hidden'); // прячем тулбар
-            }
-        });
-
-        // --- ИНЛАЙН РЕДАКТОР (Для каждого текста отдельно) ---
-        function showInlineEditor(e) {
-            e.stopPropagation();
-            if (!isEditing) return;
-            
-            currentEditingElement = e.currentTarget;
-            
-            // Получаем текущие стили элемента
-            const currentStyle = window.getComputedStyle(currentEditingElement);
-            
-            // Позиционируем панельку
-            const rect = currentEditingElement.getBoundingClientRect();
-            inlineToolbar.style.top = `${rect.top + window.scrollY}px`;
-            inlineToolbar.style.left = `${rect.left + window.scrollX}px`;
-            inlineToolbar.classList.remove('admin-hidden');
-        }
-
-        // Применяем инлайн стили
-        inlineColor.addEventListener('input', (e) => {
-            if(currentEditingElement) currentEditingElement.style.color = e.target.value;
-        });
-        inlineFont.addEventListener('change', (e) => {
-            if(currentEditingElement) currentEditingElement.style.fontFamily = e.target.value;
-        });
-
-        // Прячем тулбар при клике в пустоту
-        document.addEventListener('click', (e) => {
-            if(isEditing && !e.target.closest('#inline-toolbar') && !e.target.classList.contains('editing-mode')) {
-                inlineToolbar.classList.add('admin-hidden');
-                currentEditingElement = null;
-            }
-            // Блокируем переход по ссылкам во время редактирования
-            if (isEditing && e.target.closest('a')) e.preventDefault();
-        });
-
-
-        // --- СОХРАНЕНИЕ ---
-        btnSave.addEventListener('click', () => {
-            const wasEditing = isEditing;
-            if (wasEditing) btnEdit.click(); // Временно выключаем, чтобы убрать рамки contenteditable
-
-            // Сохраняем контент с инлайн стилями
-            const siteContent = {
-                hero: document.querySelector('#section-hero .container').innerHTML,
-                investors: document.querySelector('#investors .container').innerHTML,
-                partners: document.querySelector('#partners .container').innerHTML,
-                footer: document.querySelector('#section-footer .container').innerHTML
-            };
-            localStorage.setItem('websiteContent', JSON.stringify(siteContent));
-            
-            // Сохраняем глобальные цвета и тему
-            const siteColors = {
-                bg: inputBgColor.value,
-                text: inputTextColor.value,
-                accent: inputAccentColor.value
-            };
-            localStorage.setItem('websiteColors', JSON.stringify(siteColors));
-            localStorage.setItem('websiteThemeName', selectTheme.value);
-
-            if (wasEditing) btnEdit.click();
-            alert('Все изменения успешно сохранены!');
-        });
-
-        // --- КНОПКА ПОЛНОГО СБРОСА ДО ЗАВОДСКИХ НАСТРОЕК ---
-        btnReset.addEventListener('click', () => {
-            const confirmReset = confirm('ВНИМАНИЕ!\nВы точно хотите полностью удалить все свои изменения (тексты, цвета, шрифты) и вернуть оригинальный сайт?');
-            if (confirmReset) {
-                // Очищаем всю локальную память
-                localStorage.removeItem('websiteContent');
-                localStorage.removeItem('websiteColors');
-                localStorage.removeItem('websiteThemeName');
+            btnEdit.addEventListener('click', () => {
+                isEditing = !isEditing;
+                const elements = document.querySelectorAll(textSelectors);
                 
-                // Перезагружаем страницу, чтобы восстановить жестко прописанный в коде HTML/CSS
-                location.reload(); 
+                elements.forEach(el => {
+                    if (isEditing) {
+                        el.setAttribute('contenteditable', 'true');
+                        el.classList.add('editing-mode');
+                        el.addEventListener('click', showInlineEditor);
+                    } else {
+                        el.removeAttribute('contenteditable');
+                        el.classList.remove('editing-mode');
+                        el.removeEventListener('click', showInlineEditor);
+                    }
+                });
+
+                if (isEditing) {
+                    btnEdit.innerText = 'Выкл. Редактор';
+                    btnEdit.style.background = 'var(--accent-main)';
+                    btnEdit.style.color = '#000';
+                } else {
+                    btnEdit.innerText = 'Редактировать';
+                    btnEdit.style.background = '';
+                    btnEdit.style.color = '';
+                    inlineToolbar.classList.add('admin-hidden');
+                }
+            });
+
+            // --- ИНЛАЙН РЕДАКТОР ---
+            function showInlineEditor(e) {
+                e.stopPropagation();
+                if (!isEditing) return;
+                
+                currentEditingElement = e.currentTarget;
+                const rect = currentEditingElement.getBoundingClientRect();
+                inlineToolbar.style.top = `${rect.top + window.scrollY}px`;
+                inlineToolbar.style.left = `${rect.left + window.scrollX}px`;
+                inlineToolbar.classList.remove('admin-hidden');
             }
-        });
 
+            inlineColor.addEventListener('input', (e) => {
+                if(currentEditingElement) currentEditingElement.style.color = e.target.value;
+            });
+            inlineFont.addEventListener('change', (e) => {
+                if(currentEditingElement) currentEditingElement.style.fontFamily = e.target.value;
+            });
 
-        // --- ОСНОВНЫЕ СКРИПТЫ АНИМАЦИИ ---
-        function initSiteScripts() {
+            document.addEventListener('click', (e) => {
+                if(isEditing && !e.target.closest('#inline-toolbar') && !e.target.classList.contains('editing-mode')) {
+                    inlineToolbar.classList.add('admin-hidden');
+                    currentEditingElement = null;
+                }
+                if (isEditing && e.target.closest('a')) e.preventDefault();
+            });
+
+            // --- ГАРАНТИРОВАННОЕ СОХРАНЕНИЕ ---
+            btnSave.addEventListener('click', () => {
+                const wasEditing = isEditing;
+                // Обязательно выключаем редактор, чтобы не сохранить системные рамки
+                if (wasEditing) btnEdit.click(); 
+
+                try {
+                    // Сохраняем контент с инлайн стилями
+                    const siteContent = {
+                        hero: document.querySelector('#section-hero .container').innerHTML,
+                        investors: document.querySelector('#investors .container').innerHTML,
+                        partners: document.querySelector('#partners .container').innerHTML,
+                        footer: document.querySelector('#section-footer .container').innerHTML
+                    };
+                    localStorage.setItem('websiteContent', JSON.stringify(siteContent));
+                    
+                    // Сохраняем глобальные цвета
+                    const siteColors = {
+                        bg: inputBgColor.value,
+                        text: inputTextColor.value,
+                        accent: inputAccentColor.value
+                    };
+                    localStorage.setItem('websiteColors', JSON.stringify(siteColors));
+                    
+                    // Сохраняем глобальную тему
+                    localStorage.setItem('websiteThemeName', selectTheme.value);
+
+                    // Уведомление на кнопке для красоты
+                    btnSave.innerText = 'Сохранено ✔';
+                    btnSave.style.background = '#4CAF50';
+                    btnSave.style.color = '#fff';
+                    
+                    setTimeout(() => {
+                        btnSave.innerText = 'Сохранить';
+                        btnSave.style.background = '';
+                        btnSave.style.color = '';
+                    }, 2000);
+
+                } catch (err) {
+                    alert("Ошибка сохранения: проверьте, не находитесь ли вы в режиме Инкогнито.");
+                    console.error(err);
+                }
+
+                if (wasEditing) btnEdit.click();
+            });
+
+            // --- КНОПКА СБРОСА ---
+            btnReset.addEventListener('click', () => {
+                const confirmReset = confirm('ВНИМАНИЕ!\nВы точно хотите полностью удалить все свои изменения (тексты, цвета, шрифты) и вернуть оригинальный сайт?');
+                if (confirmReset) {
+                    localStorage.removeItem('websiteContent');
+                    localStorage.removeItem('websiteColors');
+                    localStorage.removeItem('websiteThemeName');
+                    
+                    location.reload(); 
+                }
+            });
+
+            // --- ОСНОВНЫЕ СКРИПТЫ АНИМАЦИИ ---
             const progressBar = document.getElementById('scrollProgress');
             window.addEventListener('scroll', () => {
                 const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -675,7 +689,7 @@
             const heroBg = document.getElementById('heroBg');
             window.addEventListener('scroll', () => {
                 const scrolled = window.pageYOffset;
-                if (scrolled < window.innerHeight) {
+                if (scrolled < window.innerHeight && heroBg) {
                     heroBg.style.transform = `translate3d(0, ${scrolled * 0.4}px, 0)`;
                 }
             });
@@ -698,8 +712,8 @@
                     });
                 });
             }
-        }
-        document.addEventListener('DOMContentLoaded', initSiteScripts);
+
+        }); // Конец DOMContentLoaded
     </script>
 </body>
 </html>
